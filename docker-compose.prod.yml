@@ -5,8 +5,8 @@ services:
   postgres:
     image: postgres
     environment:
-        POSTGRES_DB: beans
-        POSTGRES_PASSWORD: 2pv&mjR9Q7v79?cbYmQ7j6cUf6z9Y3
+        POSTGRES_DB: example_db
+        POSTGRES_PASSWORD: example_password
     volumes:
       - $DATA_VOLUME/var/lib/postgresql/data:/var/lib/postgresql/data
     restart: always
