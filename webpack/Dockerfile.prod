@@ -1,0 +1,8 @@
+FROM node
+RUN apt-get update
+RUN apt-get -y upgrade
+RUN npm i -g npm
+RUN mkdir -p /code/app
+WORKDIR /code/app
+ADD app /code/app
+RUN npm install

@@ -1,0 +1,7 @@
+FROM nginx
+RUN apt-get update
+RUN apt-get -y upgrade
+RUN apt-get -y install certbot
+RUN mkdir -p /static
+COPY docker/nginx/prod /etc/nginx
+COPY static /static/django

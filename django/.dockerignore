@@ -1,0 +1,8 @@
+app
+venv
+.git
+.idea
+db.sqlite3
+scrapers
+shell
+docker

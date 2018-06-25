@@ -1,0 +1,48 @@
+version: '3.6'
+
+services:
+
+  postgres:
+    image: postgres
+    environment:
+        POSTGRES_DB: beans
+        POSTGRES_PASSWORD: 2pv&mjR9Q7v79?cbYmQ7j6cUf6z9Y3
+    volumes:
+      - $DATA_VOLUME/var/lib/postgresql/data:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - 5432:5432
+
+  django:
+    build:
+      context: ..
+      dockerfile: docker/django/Dockerfile.prod
+    command: sh /code/shell/wait-for.sh postgres:5432 -- gunicorn -b 0.0.0.0:8000 --workers=2 --access-logfile=- beans.wsgi
+    depends_on:
+      - postgres
+    restart: always
+
+  webpack:
+    build:
+      context: ..
+      dockerfile: docker/webpack/Dockerfile.prod
+    command: npm run build
+    volumes:
+      - $DATA_VOLUME/app:/code/app/dist
+
+  nginx:
+    build:
+      context: ..
+      dockerfile: docker/nginx/Dockerfile.prod
+    command: nginx
+    volumes:
+      - $DATA_VOLUME/etc/letsencrypt:/etc/letsencrypt
+      - $DATA_VOLUME/var/lib/letsencrypt:/var/lib/letsencrypt
+      - $DATA_VOLUME/app:/app
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - django
+      - webpack
+    restart: always

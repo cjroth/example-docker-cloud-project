@@ -1,0 +1,8 @@
+FROM node
+RUN apt-get update
+RUN apt-get -y upgrade
+RUN npm i -g npm
+RUN mkdir /app
+WORKDIR /app
+ADD app/package.json /app/
+RUN npm install --verbose

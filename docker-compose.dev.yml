@@ -1,0 +1,50 @@
+version: '3.6'
+
+services:
+
+  postgres:
+    image: postgres
+    environment:
+        POSTGRES_DB: beans
+    ports:
+      - 5432:5432
+    volumes:
+      - ../.docker/postgres:/var/lib/postgresql/data:delegated
+
+  django:
+    build:
+      context: ..
+      dockerfile: docker/django/Dockerfile.dev
+    command: sh ./shell/wait-for.sh postgres:5432 -- python manage.py runserver 0.0.0.0:8000
+    # command: sleep 3600
+    volumes:
+      - ..:/code:cached
+    depends_on:
+      - postgres
+    ports:
+      - 8000:8000
+
+  webpack:
+    build:
+      context: ..
+      dockerfile: docker/webpack/Dockerfile.dev
+    command: npm run dev-server
+    volumes:
+      # Enable this if you want to cache node_modules outside
+      # of the container
+      # - ../.docker/webpack:/app/node_modules
+      - ../app:/app:cached
+    ports:
+      - 8080:8080
+
+  nginx:
+    image: nginx
+    ports:
+      - 80:80
+    command: nginx
+    volumes:
+      - ./nginx/dev/conf.d:/etc/nginx/conf.d
+      - ./nginx/dev/nginx.conf:/etc/nginx/nginx.conf
+    # depends_on:
+    #   - webpack
+    #   - django
